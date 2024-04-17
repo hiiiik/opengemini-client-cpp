@@ -14,5 +14,15 @@
 # limitations under the License.
 #
 
-add_subdirectory(util)
-add_subdirectory(unit)
+include_guard()
+include(FetchContent)
+
+message(STATUS "Finding {fmt} package first before trying to download and build it from source")
+
+FetchContent_Declare(fmt
+    GIT_REPOSITORY https://github.com/fmtlib/fmt
+    GIT_TAG        10.2.1
+    GIT_PROGRESS   TRUE
+    FIND_PACKAGE_ARGS
+)
+FetchContent_MakeAvailable(fmt)

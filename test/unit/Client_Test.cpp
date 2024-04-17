@@ -16,10 +16,18 @@
 
 #include <gtest/gtest.h>
 
-#include "opengeminicpp/Client.hpp"
+#include "opengemini/Client.hpp"
+#include "opengemini/ClientConfigBuilder.hpp"
 
-TEST(ImportTest, TestSimpleDeclaration)
+namespace opengemini::test {
+
+TEST(ClientTest, PingBasicUsage)
 {
-    [[maybe_unused]] opengeminicpp::Client client;
-    SUCCEED();
+    Client client{ ClientConfigBuilder()
+                       .AppendAddress({ "127.0.0.1", 8086 })
+                       .Finalize() };
+
+    EXPECT_NO_THROW(client.Ping(0));
 }
+
+} // namespace opengemini::test

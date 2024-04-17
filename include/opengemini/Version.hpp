@@ -14,11 +14,35 @@
 // limitations under the License.
 //
 
-#include "opengeminicpp/impl/Client.hpp"
+/// @file Version.hpp
+#ifndef OPENGEMINI_VERSION_HPP
+#define OPENGEMINI_VERSION_HPP
 
-namespace opengeminicpp {
+///
+/// \~Chinese
+/// @brief 库主版本号。
+///
+/// \~English
+/// @brief Major version number of the library.
+///
+#define OPENGEMINI_VERSION_MAJOR 0
 
-Client::Client() : impl(std::make_unique<Client::ClientImpl>()) { }
-Client::~Client() = default;
+///
+/// \~Chinese
+/// @brief 库次版本号。
+///
+/// \~English
+/// @brief Minor version number of the library.
+///
+#define OPENGEMINI_VERSION_MINOR 1
 
-} // namespace opengeminicpp
+///
+/// \~Chinese
+/// @brief 库修正版本号。
+///
+/// \~English
+/// @brief Patch version number of the library.
+///
+#define OPENGEMINI_VERSION_PATCH 0
+
+#endif // !OPENGEMINI_VERSION_HPP

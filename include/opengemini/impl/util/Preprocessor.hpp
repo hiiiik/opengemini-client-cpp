@@ -14,15 +14,13 @@
 // limitations under the License.
 //
 
-#ifndef OPENGEMINICPP_IMPL_CLIENT_HPP
-#define OPENGEMINICPP_IMPL_CLIENT_HPP
+#ifndef OPENGEMINI_UTIL_PREPROCESSOR_HPP
+#define OPENGEMINI_UTIL_PREPROCESSOR_HPP
 
-#include "opengeminicpp/Client.hpp"
+#ifdef OPENGEMINI_SEPERATE_COMPILATION
+#    define OPENGEMINI_INLINE_SPECIFIER
+#else
+#    define OPENGEMINI_INLINE_SPECIFIER inline
+#endif // OPENGEMINI_SEPERATE_COMPILATION
 
-namespace opengeminicpp {
-
-class Client::ClientImpl { };
-
-} // namespace opengeminicpp
-
-#endif // OPENGEMINICPP_IMPL_CLIENT_HPP
+#endif // !OPENGEMINI_UTIL_PREPROCESSOR_HPP

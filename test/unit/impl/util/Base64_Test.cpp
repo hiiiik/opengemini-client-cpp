@@ -14,27 +14,15 @@
 // limitations under the License.
 //
 
-#ifndef OPENGEMINICPP_CLIENT_HPP
-#define OPENGEMINICPP_CLIENT_HPP
+#include <gtest/gtest.h>
 
-#include <memory>
+#include "opengemini/impl/util/Base64.hpp"
 
-namespace opengeminicpp {
+namespace opengemini::test {
 
-class Client {
-public:
-    Client();
-    ~Client();
+TEST(Base64Test, EncodeSomeText)
+{
+    EXPECT_EQ(util::Base64Encode("test text"), "dGVzdCB0ZXh0");
+}
 
-private:
-    class ClientImpl;
-    std::unique_ptr<ClientImpl> impl;
-};
-
-} // namespace opengeminicpp
-
-#ifndef OPENGEMINICPP_SEPERATE_COMPILATION
-#    include "opengeminicpp/impl/client.cpp"
-#endif // !OPENGEMINICPP_SEPERATE_COMPILATION
-
-#endif // OPENGEMINICPP_CLIENT_HPP
+} // namespace opengemini::test

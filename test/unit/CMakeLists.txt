@@ -14,5 +14,27 @@
 # limitations under the License.
 #
 
-add_subdirectory(util)
-add_subdirectory(unit)
+include(${PROJECT_SOURCE_DIR}/cmake/deps/googletest.cmake)
+
+add_executable(UnitTest
+    Client_Test.cpp
+    ClientConfigBuilder_Test.cpp
+    impl/http/HttpsClient_Test.cpp
+    impl/http/IHttpClient_Test.cpp
+    impl/util/Base64_Test.cpp
+    impl/lb/ServerBalancer_Test.cpp
+    impl/cli/Ping_Test.cpp
+)
+add_executable(${PROJECT_NAME}::UnitTest ALIAS UnitTest)
+
+target_link_libraries(UnitTest
+    PRIVATE
+        ${PROJECT_NAME}::Client
+        ${PROJECT_NAME}::TestUtil
+
+        GTest::gmock
+        GTest::gmock_main
+)
+
+include(GoogleTest)
+gtest_discover_tests(UnitTest)
