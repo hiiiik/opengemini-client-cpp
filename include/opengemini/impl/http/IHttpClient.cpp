@@ -18,6 +18,8 @@
 
 #include <fmt/format.h>
 
+#include "opengemini/Error.hpp"
+#include "opengemini/Exception.hpp"
 #include "opengemini/Version.hpp"
 #include "opengemini/impl/util/Preprocessor.hpp"
 
@@ -52,6 +54,26 @@ Response IHttpClient::Get(const Endpoint&            endpoint,
 }
 
 OPENGEMINI_INLINE_SPECIFIER
+Response IHttpClient::Get(const Endpoint&            endpoint,
+                          std::string                target,
+                          boost::asio::yield_context yield,
+                          Error&                     error)
+try {
+    auto rsp = Get(endpoint, target, yield);
+    error.Clear();
+    return rsp;
+}
+catch (const Exception& ex) {
+    error = ex.UnderlyingError();
+    return {};
+}
+catch (...) {
+    error.Assign(errc::RuntimeErrors::Unexcepted,
+                 boost::current_exception_diagnostic_information());
+    return {};
+}
+
+OPENGEMINI_INLINE_SPECIFIER
 Response IHttpClient::Post(const Endpoint&            endpoint,
                            std::string                target,
                            std::string                body,
@@ -63,6 +85,27 @@ Response IHttpClient::Post(const Endpoint&            endpoint,
                                     std::move(body),
                                     boost::beast::http::verb::post),
                        yield);
+}
+
+OPENGEMINI_INLINE_SPECIFIER
+Response IHttpClient::Post(const Endpoint&            endpoint,
+                           std::string                target,
+                           std::string                body,
+                           boost::asio::yield_context yield,
+                           Error&                     error)
+try {
+    auto rsp = Post(endpoint, target, body, yield);
+    error.Clear();
+    return rsp;
+}
+catch (const Exception& ex) {
+    error = ex.UnderlyingError();
+    return {};
+}
+catch (...) {
+    error.Assign(errc::RuntimeErrors::Unexcepted,
+                 boost::current_exception_diagnostic_information());
+    return {};
 }
 
 OPENGEMINI_INLINE_SPECIFIER
