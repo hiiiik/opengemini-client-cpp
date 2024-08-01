@@ -14,19 +14,21 @@
 // limitations under the License.
 //
 
-#ifndef OPENGEMINI_RPCONFIG_HPP
-#define OPENGEMINI_RPCONFIG_HPP
+#ifndef OPENGEMINI_RETENTIONPOLICY_HPP
+#define OPENGEMINI_RETENTIONPOLICY_HPP
 
 #include <string>
+
+#include <fmt/format.h>
 
 namespace opengemini {
 
 ///
 /// \~English
-/// @brief The retention policy.
+/// @brief The retention policy configuration.
 ///
 /// \~Chinese
-/// @brief 保留策略。
+/// @brief 保留策略配置。
 ///
 struct RpConfig {
     ///
@@ -66,10 +68,70 @@ struct RpConfig {
     std::string indexDuration;
 };
 
+///
+/// \~English
+/// @brief The retention policy.
+///
+/// \~Chinese
+/// @brief 保留策略。
+///
+struct RetentionPolicy {
+    ///
+    /// \~English
+    /// @brief Name of the retention policy.
+    ///
+    /// \~Chinese
+    /// @brief 保留策略的名称。
+    ///
+    std::string name;
+
+    ///
+    /// \~English
+    /// @brief How long OpenGemini keeps the data.
+    ///
+    /// \~Chinese
+    /// @brief OpenGemini保留数据多长时间。
+    ///
+    std::string duration;
+
+    ///
+    /// \~English
+    /// @brief The time range of shard group.
+    ///
+    /// \~Chinese
+    /// @brief 分片组的时间范围。
+    ///
+    std::string shardGroupDuration;
+
+    std::string hotDuration;
+
+    std::string warmDuration;
+
+    ///
+    /// \~English
+    /// @brief The time range of index group.
+    ///
+    /// \~Chinese
+    /// @brief 索引组的时间范围。
+    ///
+    std::string indexDuration;
+
+    uint64_t replicaNum;
+
+    ///
+    /// \~English
+    /// @brief Whether it is the default policy.
+    ///
+    /// \~Chinese
+    /// @brief 是否为默认策略。
+    ///
+    bool isDefault;
+};
+
 } // namespace opengemini
 
 // We include this because anyone who uses RpConfig
 // will very likely need the literals.
 #include "opengemini/impl/util/DurationLiterals.hpp"
 
-#endif // !OPENGEMINI_RPCONFIG_HPP
+#endif // !OPENGEMINI_RETENTIONPOLICY_HPP
