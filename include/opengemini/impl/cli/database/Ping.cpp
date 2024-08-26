@@ -14,41 +14,27 @@
 // limitations under the License.
 //
 
-#include "opengemini/impl/cli/Functor.hpp"
-
-#include <boost/url.hpp>
+#include "opengemini/impl/cli/database/Ping.hpp"
 
 #include "opengemini/Exception.hpp"
 #include "opengemini/impl/comm/UrlTargets.hpp"
-#include "opengemini/impl/enc/LineProtocolEncoder.hpp"
 
-namespace opengemini::impl {
+namespace opengemini::impl::cli {
 
-template<typename POINT_TYPE>
-void ClientImpl::Functor::RunWrite<POINT_TYPE>::operator()(
-    boost::asio::yield_context yield) const
+OPENGEMINI_INLINE_SPECIFIER
+std::string RunPing::operator()(boost::asio::yield_context yield) const
 {
-    if (db_.empty()) {
-        throw Exception(errc::LogicErrors::InvalidArgument,
-                        "Database name cannot be empty");
-    }
+    auto rsp = http_.Get(lb_.PickServer(index_), url::PING, yield);
 
-    auto content = enc::LineProtocolEncoder{}.Encode(point_);
-    if (content.empty()) { return; }
-
-    boost::url target(url::WRITE);
-    target.set_query(fmt::format("db={}&rp={}", db_, rp_));
-
-    auto rsp = impl_->http_->Post(impl_->lb_->PickAvailableServer(),
-                                  target.buffer(),
-                                  std::move(content),
-                                  yield);
     if (rsp.result() != http::Status::no_content) {
         throw Exception(errc::ServerErrors::UnexpectedStatusCode,
                         fmt::format("Received code: {}, body:{}",
                                     rsp.result_int(),
                                     rsp.body()));
     }
+
+    auto version = rsp.find("X-Geminidb-Version");
+    return version != rsp.end() ? version->value() : "Unknown";
 }
 
-} // namespace opengemini::impl
+} // namespace opengemini::impl::cli

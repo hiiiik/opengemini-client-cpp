@@ -18,7 +18,11 @@
 
 #include <boost/exception/diagnostic_information.hpp>
 
-#include "opengemini/impl/cli/Functor.hpp"
+#include "opengemini/impl/cli/database/Database.hpp"
+#include "opengemini/impl/cli/database/Ping.hpp"
+#include "opengemini/impl/cli/policy/RetentionPolicy.hpp"
+#include "opengemini/impl/cli/query/Query.hpp"
+#include "opengemini/impl/cli/write/Write.hpp"
 #include "opengemini/impl/comm/CompletionSignature.hpp"
 #include "opengemini/impl/util/ErrorHandling.hpp"
 #include "opengemini/impl/util/TypeTraits.hpp"
@@ -35,7 +39,7 @@ auto ClientImpl::Ping(std::size_t index, COMPLETION_TOKEN&& token)
                           "Completion signature of Ping must be: "
                           "void(std::exception_ptr, std::string)");
 
-            Spawn<Signature>(Functor::RunPing{ this, index },
+            Spawn<Signature>(cli::RunPing{ { *http_, *lb_ }, index },
                              OPENGEMINI_PF(token));
         },
         token,
@@ -52,8 +56,9 @@ auto ClientImpl::Query(struct Query query, COMPLETION_TOKEN&& token)
                           "Completion signature of Query must be: "
                           "void(std::exception_ptr, QueryResult)");
 
-            Spawn<Signature>(Functor::RunQueryGet{ this, std::move(query) },
-                             OPENGEMINI_PF(token));
+            Spawn<Signature>(
+                cli::RunQueryGet{ { *http_, *lb_ }, std::move(query) },
+                OPENGEMINI_PF(token));
         },
         token,
         std::move(query));
@@ -73,9 +78,9 @@ auto ClientImpl::CreateDatabase(std::string_view        database,
                           "Completion signature of CreateDatabase must be: "
                           "void(std::exception_ptr)");
 
-            Spawn<Signature>(Functor::RunCreateDatabase{ this,
-                                                         std::move(database),
-                                                         std::move(rpConfig) },
+            Spawn<Signature>(cli::RunCreateDatabase{ { *http_, *lb_ },
+                                                     std::move(database),
+                                                     std::move(rpConfig) },
                              OPENGEMINI_PF(token));
         },
         token,
@@ -93,7 +98,7 @@ auto ClientImpl::ShowDatabase(COMPLETION_TOKEN&& token)
                           "Completion signature of ShowDatabase must be: "
                           "void(std::exception_ptr, std::vector<std::string>)");
 
-            Spawn<Signature>(Functor::RunShowDatabase{ this },
+            Spawn<Signature>(cli::RunShowDatabase{ { *http_, *lb_ } },
                              OPENGEMINI_PF(token));
         },
         token);
@@ -111,7 +116,7 @@ auto ClientImpl::DropDatabase(std::string_view   database,
                           "void(std::exception_ptr)");
 
             Spawn<Signature>(
-                Functor::RunDropDatabase{ this, std::move(database) },
+                cli::RunDropDatabase{ { *http_, *lb_ }, std::move(database) },
                 OPENGEMINI_PF(token));
         },
         token,
@@ -135,12 +140,11 @@ auto ClientImpl::CreateRetentionPolicy(std::string_view   database,
                 "Completion signature of CreateRetentionPolicy must be: "
                 "void(std::exception_ptr)");
 
-            Spawn<Signature>(
-                Functor::RunCreateRetentionPolicy{ this,
-                                                   std::move(database),
-                                                   std::move(rpConfig),
-                                                   isDefault },
-                OPENGEMINI_PF(token));
+            Spawn<Signature>(cli::RunCreateRetentionPolicy{ { *http_, *lb_ },
+                                                            std::move(database),
+                                                            std::move(rpConfig),
+                                                            isDefault },
+                             OPENGEMINI_PF(token));
         },
         token,
         std::string(database),
@@ -161,7 +165,8 @@ auto ClientImpl::ShowRetentionPolicies(std::string_view   database,
                 "void(std::exception_ptr, std::vector<RetentionPolicy>)");
 
             Spawn<Signature>(
-                Functor::RunShowRetentionPolicies{ this, std::move(database) },
+                cli::RunShowRetentionPolicies{ { *http_, *lb_ },
+                                               std::move(database) },
                 OPENGEMINI_PF(token));
         },
         token,
@@ -184,9 +189,9 @@ auto ClientImpl::DropRetentionPolicy(std::string_view   database,
                 "void(std::exception_ptr)");
 
             Spawn<Signature>(
-                Functor::RunDropRetentionPolicy{ this,
-                                                 std::move(database),
-                                                 std::move(retentionPolicy) },
+                cli::RunDropRetentionPolicy{ { *http_, *lb_ },
+                                             std::move(database),
+                                             std::move(retentionPolicy) },
                 OPENGEMINI_PF(token));
         },
         token,
@@ -211,10 +216,10 @@ auto ClientImpl::Write(std::string_view   database,
                           "void(std::exception_ptr)");
 
             Spawn<Signature>(
-                Functor::RunWrite<POINT_TYPE>{ this,
-                                               std::move(database),
-                                               std::move(retentionPolicy),
-                                               std::move(point) },
+                cli::RunWrite<POINT_TYPE>{ { *http_, *lb_ },
+                                           std::move(database),
+                                           std::move(retentionPolicy),
+                                           std::move(point) },
                 OPENGEMINI_PF(token));
         },
         token,
@@ -257,5 +262,3 @@ void ClientImpl::Spawn(FUNCTION&& func, COMPLETION_TOKEN&& token)
 }
 
 } // namespace opengemini::impl
-
-#include "opengemini/impl/cli/Write.tpp"
